@@ -81,14 +81,15 @@ p {
 
 #app {
   max-width: 100%;
-  margin: 0 auto;
+
   min-height: calc(100svh - 16px);
+  margin-bottom: 16px;
 
   display: grid;
-  grid-template-columns: 1;
+  grid-template-columns: 1fr;
   grid-template-rows: 50svh 1fr 24px;
 
-  margin-bottom: 16px;
+  row-gap: 16px;
 }
 
 #override-warning {
@@ -114,7 +115,7 @@ p {
   & > div {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-evenly;
     flex-grow: 1;
     max-width: 500px;
   }

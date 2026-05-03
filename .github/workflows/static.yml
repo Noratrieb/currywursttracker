@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: "pnpm install"
       - name: Build
-        run: "pnpm build --base=jass-rumba"
+        run: "pnpm build --base=currywursttracker"
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

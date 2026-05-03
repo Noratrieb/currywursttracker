@@ -81,6 +81,8 @@ const getLocationStation = async (coords: WorldPosition) => {
   return stations.filter((station) => station.id).at(0);
 };
 
+const MINUTES_TO_SWITCH_TRAINS = 3;
+
 const renderStops = (stops: CurrywurstStop[]) => {
   const elem = document.getElementById("station-departures")!;
 
@@ -107,16 +109,28 @@ const renderStops = (stops: CurrywurstStop[]) => {
         from: station.name,
         to: stop.station,
         date: date.toPlainDate().toString(),
-        time: date.toPlainTime().toString(),
+        // Ensure that we have 3 minutes left
+        time: date
+          .toPlainTime()
+          .subtract({ minutes: MINUTES_TO_SWITCH_TRAINS })
+          .toString(),
         isArrivalTime: "1",
       });
 
       const connection = connections
+        // No past connections
         .filter(
           (connection) =>
             Temporal.Instant.from(connection.from.departure!)
               .epochMilliseconds >
             getCurrentDateTime().toInstant().epochMilliseconds,
+        )
+        // No connections that are too late
+        .filter(
+          (connection) =>
+            Temporal.Instant.from(connection.to.arrival!).epochMilliseconds <=
+            date.toInstant().subtract({ minutes: MINUTES_TO_SWITCH_TRAINS })
+              .epochMilliseconds,
         )
         .at(-1);
 
@@ -180,10 +194,12 @@ const refreshData = async () => {
             `<div class="station-popup">
               <div>${stop.station}</div>
               <ul>
-                ${stops.map(
-                  (stop) =>
-                    `<li>${stop.departure.toZonedDateTimeISO("Europe/Zurich").toPlainTime()}</li>`,
-                ).join("")}
+                ${stops
+                  .map(
+                    (stop) =>
+                      `<li>${stop.departure.toZonedDateTimeISO("Europe/Zurich").toPlainTime()}</li>`,
+                  )
+                  .join("")}
               </ul>
             </div>`,
           ),

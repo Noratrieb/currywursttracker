@@ -32,6 +32,11 @@ export type Prognosis = {
   departure: string;
 };
 
+export type Connection = {
+  from: Stop;
+  to: Stop;
+};
+
 export const getStationboard = async (query: {
   station: string;
   limit?: string;
@@ -53,6 +58,62 @@ export const getStationboard = async (query: {
   if (!res.ok) {
     throw new Error(
       `error getting stationboard (${res.status} ${res.statusText}): ${await res.text()}`,
+    );
+  }
+  return res.json();
+};
+
+export const getLocations = async (
+  query: {
+    type: "all" | "station" | "poi" | "address";
+  } & (
+    | { query: string }
+    | {
+        x: string;
+        y: string;
+      }
+  ),
+): Promise<{
+  stations: Location[];
+}> => {
+  const res = await fetch(
+    `https://transport.opendata.ch/v1/locations?${new URLSearchParams(query).toString()}`,
+    {
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+  if (!res.ok) {
+    throw new Error(
+      `error getting locations (${res.status} ${res.statusText}): ${await res.text()}`,
+    );
+  }
+  return res.json();
+};
+
+export const getConnections = async (query: {
+  from: string;
+  to: string;
+  /** Date of the connection, in the format YYYY-MM-DD */
+  date?: string;
+  /** Time of the connection, in the format hh:mm */
+  time?: string;
+  isArrivalTime?: "0" | "1";
+}): Promise<{
+  connections: Connection[];
+}> => {
+  const res = await fetch(
+    `https://transport.opendata.ch/v1/connections?${new URLSearchParams(query).toString()}`,
+    {
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+  if (!res.ok) {
+    throw new Error(
+      `error getting connections (${res.status} ${res.statusText}): ${await res.text()}`,
     );
   }
   return res.json();

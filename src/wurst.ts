@@ -1,3 +1,4 @@
+import { getCurrentDateTime } from "./current-date";
 import { getStationboard } from "./transport";
 import { Temporal } from "temporal-polyfill";
 
@@ -11,14 +12,16 @@ export type CurrywurstStop = {
 };
 
 export async function* findCurrywurstOpportunities(): AsyncGenerator<CurrywurstStop> {
-  const morning = Temporal.Now.plainDateISO("Europe/Zurich");
+  const currentDate = getCurrentDateTime()
+    .withTimeZone("Europe/Zurich")
+    .toPlainDate();
 
   for (const baseStation of ICE_STARTS) {
     const result = await getStationboard({
       station: baseStation,
       limit: "200",
       transportations: "train",
-      datetime: `${morning.toString()} 00:00`,
+      datetime: `${currentDate.toString()} 00:00`,
     });
 
     const ices = result.stationboard.filter((line) => line.category === "ICE");

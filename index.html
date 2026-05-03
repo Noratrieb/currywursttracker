@@ -12,6 +12,7 @@
 
       <section id="station-results">
         <div>
+          <div id="override-warning">⚠️ date/time are currently overriden</div>
           <div id="station-spinner" class="train-spinner"></div>
           <table>
             <thead>
@@ -24,6 +25,35 @@
             <tbody id="station-departures"></tbody>
           </table>
         </div>
+      </section>
+
+      <section id="footer-settings">
+        <div>
+          <p>currywurst tracker</p>
+          <button command="show-modal" commandfor="settings-dialog">
+            settings
+          </button>
+        </div>
+        <dialog id="settings-dialog">
+          <form id="settings-form">
+            <h3>settings</h3>
+            <fieldset>
+              <legend>current time (clear for actual time)</legend>
+              <div>
+                <label>date <input name="date" type="date" /> </label>
+              </div>
+              <div>
+                <label>time <input name="time" type="time" /> </label>
+              </div>
+            </fieldset>
+            <button type="submit">
+              Confirm
+            </button>
+            <button type="button" command="close" commandfor="settings-dialog">
+              Cancel
+            </button>
+          </form>
+        </dialog>
       </section>
     </div>
     <script type="module" src="/src/main.ts"></script>

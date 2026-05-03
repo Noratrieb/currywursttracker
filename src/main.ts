@@ -1,4 +1,4 @@
-import maplibregl from "maplibre-gl";
+import maplibregl, { Popup } from "maplibre-gl";
 import "./style.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { findCurrywurstOpportunities, type CurrywurstStop } from "./wurst";
@@ -50,7 +50,7 @@ const getCurrentPositionCached = async (): Promise<WorldPosition> => {
 
   if (
     cacheContent &&
-    Temporal.Instant.from(cacheContent.instant).add({ minutes: 3 })
+    Temporal.Instant.from(cacheContent.instant).add({ minutes: 5 })
       .epochMilliseconds > Temporal.Now.instant().epochMilliseconds
   ) {
     return cacheContent;
@@ -147,6 +147,8 @@ const refreshData = async () => {
   await withStationSpinner(async () => {
     const currywurstStops = [];
 
+    const stopsPerStation = new Map<string, CurrywurstStop[]>();
+
     for await (const stop of findCurrywurstOpportunities()) {
       if (
         stop.departure.epochMilliseconds <
@@ -155,13 +157,37 @@ const refreshData = async () => {
         continue;
       }
 
+      const station = stopsPerStation.get(stop.stationId);
+      if (!station) {
+        stopsPerStation.set(stop.stationId, [stop]);
+      } else {
+        station.push(stop);
+      }
+
       currywurstStops.push(stop);
+    }
+
+    for (const [, stops] of stopsPerStation.entries()) {
+      const stop = stops[0];
 
       const currywurstIconElem = document.createElement("img");
       currywurstIconElem.src = currywurstImage;
       currywurstIconElem.height = 48;
       new maplibregl.Marker({ element: currywurstIconElem })
         .setLngLat([stop.coordinate.y, stop.coordinate.x])
+        .setPopup(
+          new Popup().setHTML(
+            `<div class="station-popup">
+              <div>${stop.station}</div>
+              <ul>
+                ${stops.map(
+                  (stop) =>
+                    `<li>${stop.departure.toZonedDateTimeISO("Europe/Zurich").toPlainTime()}</li>`,
+                ).join("")}
+              </ul>
+            </div>`,
+          ),
+        )
         .addTo(map);
     }
 

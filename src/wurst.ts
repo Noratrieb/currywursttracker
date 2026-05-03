@@ -34,7 +34,7 @@ export async function* findCurrywurstOpportunities(): AsyncGenerator<CurrywurstS
         coordinate: ice.stop.station.coordinate,
       };
 
-      for (const pass of ice.passList) {
+      for (const pass of ice.passList.slice(0, ice.passList.length - 1)) {
         if (!pass.station.name || !pass.departure) {
           continue;
         }

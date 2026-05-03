@@ -87,7 +87,7 @@ p {
   display: grid;
   grid-template-columns: 1;
   grid-template-rows: 50svh 1fr 24px;
-  
+
   margin-bottom: 16px;
 }
 
@@ -141,4 +141,13 @@ p {
 
 .hidden {
   display: none;
+}
+
+.station-popup {
+  color: black;
+
+  ul {
+    list-style: none;
+    padding: 8px;
+  }
 }
